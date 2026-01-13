@@ -612,10 +612,10 @@ class ModelViewProcessor @JvmOverloads constructor(
         modelClassMap.values.forEach { modelViewInfo ->
             // Skip generated model super classes since it will already contain all of the functions
             // necessary for included attributes, and duplicating them is a waste.
-            if (modelViewInfo.isSuperClassAlsoGenerated) return@forEach
+            if (modelViewInfo.isSuperClassAlsoGenerated(memoizer)) return@forEach
 
             memoizer.getInheritedEpoxyAttributes(
-                modelViewInfo.superClassElement.type,
+                modelViewInfo.safeSuperClassElement().type,
                 modelViewInfo.generatedName.packageName(),
                 logger
             ).let { modelViewInfo.addAttributes(it) }

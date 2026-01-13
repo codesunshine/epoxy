@@ -91,12 +91,13 @@ class ModelBuilderInterfaceWriter(
                 addAnnotation(EpoxyBuildScope::class.java)
             }
 
-            if (modelInfo.memoizer.implementsModelCollector(modelInfo.superClassElement)) {
+            val superClassElement = modelInfo.safeSuperClassElement()
+            if (modelInfo.memoizer.implementsModelCollector(superClassElement)) {
                 // If the model implements "ModelCollector" we want the builder too
                 addSuperinterface(ClassNames.MODEL_COLLECTOR)
             }
 
-            addOriginatingElement(modelInfo.superClassElement)
+            addOriginatingElement(superClassElement)
         }
 
         JavaFile.builder(modelInfo.generatedName.packageName(), modelInterface)

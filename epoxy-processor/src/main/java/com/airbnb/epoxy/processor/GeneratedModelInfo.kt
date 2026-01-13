@@ -17,6 +17,15 @@ import javax.lang.model.element.Modifier
 abstract class GeneratedModelInfo(val memoizer: Memoizer) {
 
     lateinit var superClassElement: XTypeElement
+
+    /**
+     * Looks up and returns the super class element by FQN, to avoid errors from accessing
+     * an XTypeElement from a previous processing round.
+     */
+    fun safeSuperClassElement(): XTypeElement {
+        return memoizer.environment.requireTypeElement(superClassElement.qualifiedName)
+    }
+
     lateinit var superClassName: TypeName
     lateinit var parameterizedGeneratedName: TypeName
     lateinit var generatedName: ClassName
@@ -86,7 +95,7 @@ abstract class GeneratedModelInfo(val memoizer: Memoizer) {
      */
     fun collectMethodsReturningClassType(superModelClass: XTypeElement) {
         methodsReturningClassType
-            .addAll(memoizer.getMethodsReturningClassType(superModelClass.type, memoizer))
+            .addAll(memoizer.getMethodsReturningClassType(superModelClass.qualifiedName, memoizer))
     }
 
     @Synchronized
@@ -152,8 +161,10 @@ abstract class GeneratedModelInfo(val memoizer: Memoizer) {
      * @return True if the super class of this generated model is also extended from a generated
      * model.
      */
-    val isSuperClassAlsoGenerated: Boolean
-        get() = superClassElement.type.isSubTypeOf(memoizer.generatedModelType)
+    fun isSuperClassAlsoGenerated(currentMemoizer: Memoizer): Boolean {
+        val generatedModelType = currentMemoizer.generatedModelType
+        return safeSuperClassElement().type.isSubTypeOf(generatedModelType)
+    }
 
     data class ConstructorInfo internal constructor(
         val modifiers: Set<Modifier>,

@@ -89,5 +89,5 @@ internal class BasicGeneratedModelInfo(
         )
     }
 
-    override fun additionalOriginatingElements(): List<XElement> = listOf(superClassElement)
+    override fun additionalOriginatingElements(): List<XElement> = listOf(safeSuperClassElement())
 }

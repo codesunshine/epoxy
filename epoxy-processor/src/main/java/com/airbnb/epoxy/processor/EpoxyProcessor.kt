@@ -106,7 +106,7 @@ class EpoxyProcessor @JvmOverloads constructor(
         val styleableModels = modelInfos
             .filterIsInstance<BasicGeneratedModelInfo>()
             .filter { modelInfo ->
-                modelInfo.superClassElement.getAnnotation(EpoxyModelClass::class)?.getAsInt("layout") == 0 &&
+                modelInfo.safeSuperClassElement().getAnnotation(EpoxyModelClass::class)?.getAsInt("layout") == 0 &&
                     modelInfo.boundObjectTypeElement?.hasStyleableAnnotation() == true
             }
         timer.markStepCompleted("check for styleable models")
