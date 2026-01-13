@@ -89,5 +89,5 @@ internal class BasicGeneratedModelInfo(
         )
     }
 
-    override fun additionalOriginatingElements(): List<XElement> = listOf(safeSuperClassElement())
+    override fun additionalOriginatingElements(currentMemoizer: Memoizer): List<XElement> = listOf(safeSuperClassElement(currentMemoizer))
 }

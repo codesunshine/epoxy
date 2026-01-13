@@ -245,7 +245,8 @@ abstract class BaseProcessor(val kspEnvironment: SymbolProcessorEnvironment? = n
             // TODO: Potentially generate a single file per model to allow for an isolating processor
             kotlinExtensionWriter.generateExtensionsForModels(
                 generatedModels,
-                processorName
+                processorName,
+                memoizer
             )
             timer.markStepCompleted("generateKotlinExtensions")
         }

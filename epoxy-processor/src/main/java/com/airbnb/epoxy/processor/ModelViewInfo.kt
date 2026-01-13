@@ -54,10 +54,10 @@ class ModelViewInfo(
             superClassElement.name != ClassNames.EPOXY_MODEL_UNTYPED.simpleName()
         ) {
             // If the view has a custom base model then we copy any custom constructors on it
-            constructors.addAll(getClassConstructors(safeSuperClassElement()))
+            constructors.addAll(getClassConstructors(safeSuperClassElement(memoizer)))
         }
 
-        collectMethodsReturningClassType(safeSuperClassElement())
+        collectMethodsReturningClassType(safeSuperClassElement(memoizer))
 
         // The bound type is the type of this view
         modelType = viewElement.type.typeName
@@ -182,5 +182,5 @@ class ModelViewInfo(
         return element.parameters.singleOrNull()?.hasDefaultValue == true
     }
 
-    override fun additionalOriginatingElements() = listOf(viewElement)
+    override fun additionalOriginatingElements(currentMemoizer: Memoizer) = listOf(viewElement)
 }

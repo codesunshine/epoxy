@@ -44,7 +44,8 @@ class ModelBuilderInterfaceWriter(
 
     fun writeInterface(
         modelInfo: GeneratedModelInfo,
-        methods: MutableList<MethodSpec>
+        methods: MutableList<MethodSpec>,
+        memoizer: Memoizer
     ): TypeName {
 
         val interfaceName = getBuilderInterfaceClassName(modelInfo)
@@ -91,8 +92,8 @@ class ModelBuilderInterfaceWriter(
                 addAnnotation(EpoxyBuildScope::class.java)
             }
 
-            val superClassElement = modelInfo.safeSuperClassElement()
-            if (modelInfo.memoizer.implementsModelCollector(superClassElement)) {
+            val superClassElement = modelInfo.safeSuperClassElement(memoizer)
+            if (memoizer.implementsModelCollector(superClassElement)) {
                 // If the model implements "ModelCollector" we want the builder too
                 addSuperinterface(ClassNames.MODEL_COLLECTOR)
             }

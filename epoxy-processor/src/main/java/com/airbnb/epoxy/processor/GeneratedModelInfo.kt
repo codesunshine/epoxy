@@ -21,9 +21,12 @@ abstract class GeneratedModelInfo(val memoizer: Memoizer) {
     /**
      * Looks up and returns the super class element by FQN, to avoid errors from accessing
      * an XTypeElement from a previous processing round.
+     *
+     * @param currentMemoizer The memoizer from the current processing round. Must be passed
+     *        explicitly to ensure we use a fresh environment, not the stale one stored in `this.memoizer`.
      */
-    fun safeSuperClassElement(): XTypeElement {
-        return memoizer.environment.requireTypeElement(superClassElement.qualifiedName)
+    fun safeSuperClassElement(currentMemoizer: Memoizer): XTypeElement {
+        return currentMemoizer.environment.requireTypeElement(superClassElement.qualifiedName)
     }
 
     lateinit var superClassName: TypeName
@@ -73,13 +76,15 @@ abstract class GeneratedModelInfo(val memoizer: Memoizer) {
     /**
      * The elements that influence the generation of this model.
      * eg base model class for @EpoxyModelClass, view class for @ModelView, etc
+     *
+     * @param currentMemoizer The memoizer from the current processing round.
      */
-    fun originatingElements(): List<XElement> {
+    fun originatingElements(currentMemoizer: Memoizer): List<XElement> {
         return listOfNotNull(styleBuilderInfo?.styleBuilderElement)
-            .plus(additionalOriginatingElements())
+            .plus(additionalOriginatingElements(currentMemoizer))
     }
 
-    open fun additionalOriginatingElements(): List<XElement> = emptyList()
+    open fun additionalOriginatingElements(currentMemoizer: Memoizer): List<XElement> = emptyList()
 
     /**
      * Get information about constructors of the original class so we can duplicate them in the
@@ -163,7 +168,7 @@ abstract class GeneratedModelInfo(val memoizer: Memoizer) {
      */
     fun isSuperClassAlsoGenerated(currentMemoizer: Memoizer): Boolean {
         val generatedModelType = currentMemoizer.generatedModelType
-        return safeSuperClassElement().type.isSubTypeOf(generatedModelType)
+        return safeSuperClassElement(currentMemoizer).type.isSubTypeOf(generatedModelType)
     }
 
     data class ConstructorInfo internal constructor(

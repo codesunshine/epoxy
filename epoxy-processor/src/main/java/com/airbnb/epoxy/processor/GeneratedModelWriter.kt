@@ -160,7 +160,7 @@ class GeneratedModelWriter(
 
             builderHooks?.beforeFinalBuild(this)
 
-            addSuperinterface(modelInterfaceWriter.writeInterface(info, this.build().methodSpecs))
+            addSuperinterface(modelInterfaceWriter.writeInterface(info, this.build().methodSpecs, memoizer))
 
             originatingElements.forEach {
                 addOriginatingElement(it)
@@ -835,7 +835,7 @@ class GeneratedModelWriter(
         // bind!!! So we mustn't do that. So, we only call the super diff binding if we think
         // it's a custom implementation.
         if (modelImplementsBindWithDiff(
-                classInfo.safeSuperClassElement(),
+                classInfo.safeSuperClassElement(memoizer),
                 memoizer
             )
         ) {
@@ -1102,7 +1102,7 @@ class GeneratedModelWriter(
         methods: MutableList<MethodSpec>
     ) {
 
-        val originalClassElement = modelClassInfo.safeSuperClassElement()
+        val originalClassElement = modelClassInfo.safeSuperClassElement(memoizer)
         if (!originalClassElement.type.isEpoxyModelWithHolder(memoizer)) {
             return
         }
@@ -1178,7 +1178,7 @@ class GeneratedModelWriter(
             return modelInfo.getLayoutResource(resourceProcessor)
         }
 
-        val superClassElement = modelInfo.safeSuperClassElement()
+        val superClassElement = modelInfo.safeSuperClassElement(memoizer)
         if (implementsMethod(superClassElement, buildDefaultLayoutMethodBase(), environment)) {
             return null
         }
@@ -1205,7 +1205,7 @@ class GeneratedModelWriter(
      * variables that changed.
      */
     private fun generateDataBindingMethodsIfNeeded(info: GeneratedModelInfo): Iterable<MethodSpec> {
-        if (!info.safeSuperClassElement().type.isDataBindingEpoxyModel(memoizer)) {
+        if (!info.safeSuperClassElement(memoizer).type.isDataBindingEpoxyModel(memoizer)) {
             return emptyList()
         }
 
@@ -1221,7 +1221,7 @@ class GeneratedModelWriter(
 
         // If the base method is already implemented don't bother checking for the payload method
         if (implementsMethod(
-                info.safeSuperClassElement(),
+                info.safeSuperClassElement(memoizer),
                 bindVariablesMethod,
                 environment
             )
@@ -1232,7 +1232,7 @@ class GeneratedModelWriter(
         val generatedModelClass = info.generatedName
 
         val moduleName = (info as? DataBindingModelInfo)?.moduleName
-            ?: dataBindingModuleLookup.getModuleName(info.safeSuperClassElement())
+            ?: dataBindingModuleLookup.getModuleName(info.safeSuperClassElement(memoizer))
 
         val baseMethodBuilder = bindVariablesMethod.toBuilder()
 
